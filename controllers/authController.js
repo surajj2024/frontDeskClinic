@@ -42,7 +42,6 @@ const login = asyncHandler(async(req, res) => {
         { expiresIn: '7d' }
     )
 
-    // create secure cookie with refresh token
     res.cookie('jwt', refreshToken, {
         httpOnly: true, 
         secure: true, 
@@ -50,7 +49,6 @@ const login = asyncHandler(async(req, res) => {
         maxAge: 7 * 24 * 60 * 60 * 1000 
     })
 
-    // send accessToken with data "username" and "roles"
     res.json({ accessToken })
 
 })

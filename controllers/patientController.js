@@ -18,14 +18,12 @@ const getAllPatients = asyncHandler(async (req, res) => {
 const createNewPatient = asyncHandler(async (req, res) => {
     const { pID, patientName, address, mobileNumber, deceaseRecordOne, medicineRecordOne, doctorID } = req.body
 
-    // confirm data
     if(!pID || !patientName || !address || !mobileNumber || !deceaseRecordOne || !medicineRecordOne || !Array.isArray(doctorID) || !doctorID.length ) {
         return res.status(400).json({
             message: 'All fields are required'
         })
     }
 
-    // check for duplicates
     const duplicate = await Patient.findOne({pID}).lean().exec()
     if(duplicate) {
         return res.status(400).json({
@@ -35,7 +33,6 @@ const createNewPatient = asyncHandler(async (req, res) => {
 
     const patientObject = { pID, patientName, address, mobileNumber, deceaseRecordOne, medicineRecordOne, doctorID }
 
-    // Create and store new patient
     const patient = await Patient.create(patientObject)
 
     if(patient) {
@@ -56,14 +53,13 @@ const createNewPatient = asyncHandler(async (req, res) => {
 const updatePatient = asyncHandler(async (req, res) => {
     const { pToken, pID, id, patientName, address, mobileNumber, deceaseRecordOne, medicineRecordOne, doctorID } = req.body
 
-    // Confirm data
     if( !pToken || !pID || !patientName || !address || !mobileNumber || !deceaseRecordOne || !medicineRecordOne || !Array.isArray(doctorID) || !doctorID.length) {
         return res.status(400).json({
             message: 'All fields are required'
         })
     }
 
-    // check if the id exists
+
     // const patient = await Patient.findById(id).exec()
     const patient = await Patient.findOne({ pToken }).exec()
     console.log(patient)
@@ -72,7 +68,6 @@ const updatePatient = asyncHandler(async (req, res) => {
         return res.status(400).json({ message: 'Patient not found' })
     }
 
-    // check for duplicate id
     const duplicateID = await Patient.findOne({ pToken }).lean().exec()
 
     if(duplicateID && duplicateID?._id.toString() !== id) {
@@ -81,7 +76,6 @@ const updatePatient = asyncHandler(async (req, res) => {
         })
     }
 
-     // check for duplicate Email
      const duplicateEmail = await Patient.findOne({ pID }).lean().exec()
 
      if(duplicateEmail && duplicateEmail?._id.toString() !== id) {
@@ -90,7 +84,6 @@ const updatePatient = asyncHandler(async (req, res) => {
          })
      }
     
-    // Allow updates
     patient.pID = pID
     patient.patientName = patientName
     patient.address = address
@@ -101,7 +94,6 @@ const updatePatient = asyncHandler(async (req, res) => {
 
     await patient.save()
 
-    // send response
     res.json({
         message: `${patient.patientName} with token ${patient.pToken} & id ${patient.id} updated`
     })
@@ -112,14 +104,12 @@ const updatePatient = asyncHandler(async (req, res) => {
 const deletePatient = asyncHandler(async (req, res) => {
     const { pToken } = req.body
 
-    // Confirm data
     if(!pToken) {
         return res.status(400).json({
             message: 'Token required'
         })
     }   
 
-    // Check if the user exist to delete
     const patient = await Patient.findOne({ pToken }).exec()
 
     if(!patient) {
